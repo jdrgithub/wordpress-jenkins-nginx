@@ -33,7 +33,7 @@ pipeline {
         }
       }
     }
-  }
+  
     stage('Deploy to Prod') {
       steps {
         sh """
@@ -49,6 +49,7 @@ pipeline {
         """
     }
   }
+}
 }
 
 
