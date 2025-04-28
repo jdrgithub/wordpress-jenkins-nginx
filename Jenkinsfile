@@ -47,8 +47,8 @@ pipeline {
     stage('Deploy to Prod') {
       steps {
         sh """
-          docker compose -f /opt/webapps/envs/prod/docker-compose.yml --project-name prod pull wordpress
-          docker compose -f /opt/webapps/envs/prod/docker-compose.yml --project-name prod up -d wordpress
+          docker-compose -f /opt/webapps/envs/prod/docker-compose.yml --project-name prod pull wordpress
+          docker-compose -f /opt/webapps/envs/prod/docker-compose.yml --project-name prod up -d wordpress
         """
       }
     }
