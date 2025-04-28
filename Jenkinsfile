@@ -18,7 +18,7 @@ pipeline {
 
     stage('Build Image') {
       steps {
-        sh "docker build -t $FULL_IMAGE ."
+        sh "docker build -t myimage -f images/wordpress/Dockerfile ."
       }
     }
 
