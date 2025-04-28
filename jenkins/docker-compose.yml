@@ -4,12 +4,13 @@ services:
   jenkins:
     build: 
       context: /opt/webapps/jenkins
-      dockerfile: images/jenkins/Dockerfile
+      dockerfile: /opt/webapps/images/jenkins/Dockerfile
     image: jenkins/jenkins-docker-enabled:latest
     container_name: jenkins
     command: >
       bash -c "java -Djenkins.httpListenAddress=0.0.0.0 -jar /usr/share/jenkins/jenkins.war"
     volumes:
+      - /opt/webapps:/opt/webapps
       - /opt/webapps/jenkins/jenkins_home:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
