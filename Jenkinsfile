@@ -50,6 +50,7 @@ pipeline {
           docker run --rm \
             -v /opt/webapps:/opt/webapps \
             -v /var/run/docker.sock:/var/run/docker.sock \
+            -v /opt/webapps/envs/prod/.env:/opt/webapps/envs/prod/.env \
             docker/compose:latest \
             -f /opt/webapps/envs/prod/docker-compose.yml \
             --project-name prod \
@@ -58,6 +59,7 @@ pipeline {
           docker run --rm \
             -v /opt/webapps:/opt/webapps \
             -v /var/run/docker.sock:/var/run/docker.sock \
+            -v /opt/webapps/envs/prod/.env:/opt/webapps/envs/prod/.env \
             docker/compose:latest \
             -f /opt/webapps/envs/prod/docker-compose.yml \
             --project-name prod \
