@@ -52,7 +52,7 @@ pipeline {
             -v /var/run/docker.sock:/var/run/docker.sock \
             -v /opt/webapps/envs/prod/.env:/opt/webapps/envs/prod/.env \
             docker/compose:latest \
-            -f /opt/webapps/envs/prod/docker-compose.yml \
+            -f /app/docker-compose.yml \
             --project-name prod \
             pull wordpress
 
@@ -61,7 +61,7 @@ pipeline {
             -v /var/run/docker.sock:/var/run/docker.sock \
             -v /opt/webapps/envs/prod/.env:/opt/webapps/envs/prod/.env \
             docker/compose:latest \
-            -f /opt/webapps/envs/prod/docker-compose.yml \
+            -f /app/docker-compose.yml \
             --project-name prod \
             up -d wordpress
         """
