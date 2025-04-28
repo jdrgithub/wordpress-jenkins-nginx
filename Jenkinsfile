@@ -48,7 +48,7 @@ pipeline {
       steps {
         sh """
           docker run --rm \
-            -v /opt/webapps:/opt/webapps \
+            -v /opt/webapps/envs/prod:/app \
             -v /var/run/docker.sock:/var/run/docker.sock \
             -v /opt/webapps/envs/prod/.env:/opt/webapps/envs/prod/.env \
             docker/compose:latest \
@@ -57,7 +57,7 @@ pipeline {
             pull wordpress
 
           docker run --rm \
-            -v /opt/webapps:/opt/webapps \
+            -v /opt/webapps/envs/prod:/app \
             -v /var/run/docker.sock:/var/run/docker.sock \
             -v /opt/webapps/envs/prod/.env:/opt/webapps/envs/prod/.env \
             docker/compose:latest \
