@@ -18,7 +18,7 @@ pipeline {
 
     stage('Build Image') {
       steps {
-        sh "docker build -t ${DOCKERHUB_USER}/${IMAGE_NAME}:${IMAGE_TAG} -f images/wordpress/Dockerfile ."
+        sh "docker build -t ${REPO}/${IMAGE_NAME}:${IMAGE_TAG} -f images/wordpress/Dockerfile ."
       }
     }
 
