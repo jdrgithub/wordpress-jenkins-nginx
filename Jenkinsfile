@@ -6,7 +6,6 @@ pipeline {
     IMAGE_TAG = "build-${env.BUILD_NUMBER}"
     REGISTRY = "docker.io"
     REPO = "jdrdock"
-    FULL_IMAGE = "${REGISTRY}/${REPO}/${IMAGE_NAME}:${IMAGE_TAG}"
   }
 
   stages {
@@ -27,7 +26,7 @@ pipeline {
         withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
           sh """
             echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin $REGISTRY
-            sh "docker push ${REPO}/${IMAGE_NAME}:${IMAGE_TAG}"
+            docker push ${REPO}/${IMAGE_NAME}:${IMAGE_TAG}
           """
         }
       }
