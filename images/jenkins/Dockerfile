@@ -19,7 +19,7 @@ RUN groupadd -g ${DOCKER_GID} docker && \
 
 # Install Docker CLI and git
 RUN apt-get update && \
-    apt-get install -y docker.io git
+    apt-get install -y docker.io git rsync
 
 # Switch to jenkins user
 USER jenkins
