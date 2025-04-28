@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  wordpress:
+    image: jdrdock/wordpress-astra:latest
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+      WORDPRESS_DB_NAME: wordpress
+    ports:
+      - "8081:80"
+    networks:
+      - wordpress-net
+    volumes:
+      - /opt/webapps/wordpress/content:/var/www/html/wp-content
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+    volumes:
+      - db_data_prod:/var/lib/mysql
+    networks:
+      - wordpress-net
+
+networks:
+  wordpress-net:
+
+volumes:
+  db_data_prod:
+

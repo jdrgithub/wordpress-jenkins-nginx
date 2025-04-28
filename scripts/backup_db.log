@@ -1,0 +1,6 @@
+Starting MySQL backup...
+mkdir: cannot create directory ‘/opt/webapps/backups/mysql’: Permission denied
+/opt/webapps/scripts/backup_db.sh: line 19: /opt/webapps/backups/mysql/wordpress_backup_20250428_030001.sql.gz: No such file or directory
+mysqldump: [Warning] Using a password on the command line interface can be insecure.
+mysqldump: Error: 'Access denied; you need (at least one of) the PROCESS privilege(s) for this operation' when trying to dump tablespaces
+❌ Backup failed.

@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  wordpress:
+    container_name: dev_wordpress
+    image: jdrdock/wordpress-astra:latest
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DEBUG: 1
+    networks:
+      - wordpress-net
+    volumes:
+      - /opt/webapps/wordpress/content:/var/www/html/wp-content
+    ports:
+      - 8083:80
+
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - wordpress-net
+
+  
+  nginx:
+    build:
+      context: /opt/webapps/nginx
+      dockerfile: nginx-custom.Dockerfile
+    image: nginx:alpine
+    restart: always
+    command: /bin/sh -c "/etc/nginx/nginx-start.sh"
+    ports:
+      - "8082:8082"
+      - "444:444"
+    volumes:
+      - /opt/webapps/nginx/nginx.dev.conf:/etc/nginx/nginx.conf
+      - /etc/ssl/cloudflare:/etc/ssl/cloudflare:ro
+    networks:
+      - wordpress-net
+
+
+networks:
+  wordpress-net:
+    name: dev-net
+
+volumes:
+  db_data:
+

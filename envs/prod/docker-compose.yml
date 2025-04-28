@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  wordpress:
+    container_name: wordpress
+    image: jdrdock/wordpress-astra:latest
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - /opt/webapps/wordpress/content:/var/www/html/wp-content
+    networks:
+      - wordpress-net
+
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_PASSWORD: ${WORDPRESS_DB_PASSWORD}
+      MYSQL_USER: wordpress
+      MYSQL_DATABASE: wordpress
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - wordpress-net
+
+  jenkins:
+    image: jdrdock/jenkins-docker-enabled:latest
+    user: root
+    restart: always
+    volumes:
+      - /opt/webapps/jenkins/jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "8080:8080"
+    networks:
+      - wordpress-net
+
+  nginx:
+    build:
+      context: /opt/webapps/nginx
+      dockerfile: nginx-custom.Dockerfile
+    image: nginx:alpine
+    restart: always
+    command: /bin/sh -c "/etc/nginx/nginx-start.sh"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /opt/webapps/nginx/nginx.prod.conf:/etc/nginx/nginx.conf
+      - /etc/ssl/cloudflare:/etc/ssl/cloudflare:ro                                                                                                
+    networks:
+      - wordpress-net
+
+volumes:
+  db_data:
+
+networks:
+  wordpress-net:
+    name: prod-net
