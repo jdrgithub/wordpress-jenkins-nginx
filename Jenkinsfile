@@ -50,6 +50,7 @@ pipeline {
           docker run --rm \
             -v /opt/webapps:/opt/webapps \
             -v /var/run/docker.sock:/var/run/docker.sock \
+            -v /etc/ssl/cloudflare:/etc/ssl/cloudflare:ro
             --workdir /opt/webapps/envs/prod \
             docker/compose:latest \
             --project-name prod \
@@ -58,6 +59,7 @@ pipeline {
           docker run --rm \
             -v /opt/webapps:/opt/webapps \
             -v /var/run/docker.sock:/var/run/docker.sock \
+            -v /etc/ssl/cloudflare:/etc/ssl/cloudflare:ro
             --workdir /opt/webapps/envs/prod \
             docker/compose:latest \
             --project-name prod \
