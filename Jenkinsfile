@@ -47,23 +47,8 @@ pipeline {
     stage('Deploy to Prod') {
       steps {
         sh """
-          docker run --rm \
-            -v /opt/webapps:/opt/webapps \
-            -v /var/run/docker.sock:/var/run/docker.sock \
-            -v /etc/ssl/cloudflare:/etc/ssl/cloudflare:ro \
-            --workdir /opt/webapps/envs/prod \
-            docker/compose:latest \
-            --project-name prod \
-            pull wordpress
-
-          docker run --rm \
-            -v /opt/webapps:/opt/webapps \
-            -v /var/run/docker.sock:/var/run/docker.sock \
-            -v /etc/ssl/cloudflare:/etc/ssl/cloudflare:ro \
-            --workdir /opt/webapps/envs/prod \
-            docker/compose:latest \
-            --project-name prod \
-            up -d wordpress
+          docker compose -f /opt/webapps/envs/prod/docker-compose.yml --project-name prod pull wordpress
+          docker compose -f /opt/webapps/envs/prod/docker-compose.yml --project-name prod up -d wordpress
         """
       }
     }
