@@ -28,21 +28,6 @@ services:
     networks:
       - wordpress-net
 
-  jenkins:
-    build:
-      context: /opt/webapps/
-      dockerfile: images/jenkins/Dockerfile
-    image: jdrdock/jenkins-docker-enabled:latest
-    user: root
-    restart: always
-    volumes:
-      - /opt/webapps/jenkins/jenkins_home:/var/jenkins_home
-      - /var/run/docker.sock:/var/run/docker.sock
-    ports:
-      - "8080:8080"
-    networks:
-      - wordpress-net
-
   nginx:
     build:
       context: /opt/webapps/nginx

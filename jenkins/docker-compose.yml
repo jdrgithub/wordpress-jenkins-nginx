@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  jenkins:
+    build: 
+      context: /opt/webapps/jenkins
+      dockerfile: images/jenkins/Dockerfile
+    image: jenkins/jenkins-docker-enabled:latest
+    container_name: jenkins
+    command: >
+      bash -c "java -Djenkins.httpListenAddress=0.0.0.0 -jar /usr/share/jenkins/jenkins.war"
+    volumes:
+      - /opt/webapps/jenkins/jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - JENKINS_OPTS=--httpPort=8080
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+
+networks:
+  default:
+    name: jenkins-net
+
