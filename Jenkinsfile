@@ -33,6 +33,17 @@ pipeline {
         }
       }
     }
+    stage('Deploy to Prod') {
+      steps {
+        sh """
+        cd /opt/webapps/envs/prod
+        docker-compose pull wordpress
+        docker-compose up -d wordpress
+      """
+    }
+  }
+}
+
   }
 }
 
