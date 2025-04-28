@@ -48,20 +48,18 @@ pipeline {
       steps {
         sh """
           docker run --rm \
-            -v /opt/webapps/envs/prod:/app \
+            -v /opt/webapps:/opt/webapps \
             -v /var/run/docker.sock:/var/run/docker.sock \
-            -v /opt/webapps/envs/prod/.env:/opt/webapps/envs/prod/.env \
+            --workdir /opt/webapps/envs/prod \
             docker/compose:latest \
-            -f /app/docker-compose.yml \
             --project-name prod \
             pull wordpress
 
           docker run --rm \
-            -v /opt/webapps/envs/prod:/app \
+            -v /opt/webapps:/opt/webapps \
             -v /var/run/docker.sock:/var/run/docker.sock \
-            -v /opt/webapps/envs/prod/.env:/opt/webapps/envs/prod/.env \
+            --workdir /opt/webapps/envs/prod \
             docker/compose:latest \
-            -f /app/docker-compose.yml \
             --project-name prod \
             up -d wordpress
         """
