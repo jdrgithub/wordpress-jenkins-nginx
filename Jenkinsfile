@@ -37,31 +37,34 @@ pipeline {
     stage('Sync wp-content') {
       steps {
         sh """
-          docker run --rm -v /opt/webapps:/opt/webapps \
-             alpine sh -c "apk add --no-cache rsync && rsync -a --delete /opt/webapps/envs/dev/wp-content/ /opt/webapps/envs/prod/wp-content/"
+          docker run --rm \
+            -v /opt/webapps:/opt/webapps \
+            alpine sh -c "apk add --no-cache rsync && rsync -a --delete /opt/webapps/envs/dev/wp-content/ /opt/webapps/envs/prod/wp-content/"
         """
       }
     }
 
-  
     stage('Deploy to Prod') {
       steps {
         sh """
           docker run --rm \
             -v /opt/webapps:/opt/webapps \
             -v /var/run/docker.sock:/var/run/docker.sock \
-            -e COMPOSE_PROJECT_NAME=prod \
-            alpine sh -c "
-              apk add --no-cache docker-cli-compose &&
-              cd /opt/webapps/envs/prod &&
-              docker-compose pull wordpress &&
-              docker-compose up -d wordpress
-            "
+            docker/compose:latest \
+            -f /opt/webapps/envs/prod/docker-compose.yml \
+            --project-name prod \
+            pull wordpress
+
+          docker run --rm \
+            -v /opt/webapps:/opt/webapps \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            docker/compose:latest \
+            -f /opt/webapps/envs/prod/docker-compose.yml \
+            --project-name prod \
+            up -d wordpress
         """
       }
     }
- 
-    }
   }
-
+}
 
