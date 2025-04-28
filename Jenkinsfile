@@ -2,7 +2,7 @@ pipeline {
   agent any
 
   environment {
-    IMAGE_NAME = "docker.io/jdrdock/wordpress-astra"
+    IMAGE_NAME = "****/wordpress-astra"
     IMAGE_TAG = "build-${env.BUILD_NUMBER}"
     REGISTRY = "docker.io"
     REPO = "jdrdock"
@@ -18,7 +18,7 @@ pipeline {
 
     stage('Build Image') {
       steps {
-        sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -f images/wordpress/Dockerfile ."
+        sh "docker build -t ${DOCKERHUB_USER}/${IMAGE_NAME}:${IMAGE_TAG} -f images/wordpress/Dockerfile ."
       }
     }
 
@@ -27,7 +27,7 @@ pipeline {
         withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
           sh """
             echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin $REGISTRY
-            docker push $FULL_IMAGE
+            sh "docker push ${DOCKERHUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}"
           """
         }
       }
