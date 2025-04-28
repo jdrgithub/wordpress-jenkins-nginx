@@ -33,16 +33,24 @@ pipeline {
         }
       }
     }
+  }
     stage('Deploy to Prod') {
       steps {
         sh """
-        cd /opt/webapps/envs/prod
-        docker-compose pull wordpress
-        docker-compose up -d wordpress
-      """
+          # Sync wp-content first (dev -> prod)
+          rsync -a --delete /opt/webapps/envs/dev/wp-content/ /opt/webapps/envs/prod/wp-content/
+
+          # Pull the latest WordPress image
+          cd /opt/webapps/envs/prod
+          docker-compose pull wordpress
+
+          # Restart only the wordpress service
+          docker-compose up -d wordpress
+        """
     }
   }
 }
+
 
   }
 }
