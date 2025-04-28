@@ -2,7 +2,7 @@ pipeline {
   agent any
 
   environment {
-    IMAGE_NAME = "****/wordpress-astra"
+    IMAGE_NAME = "wordpress-astra"
     IMAGE_TAG = "build-${env.BUILD_NUMBER}"
     REGISTRY = "docker.io"
     REPO = "jdrdock"
