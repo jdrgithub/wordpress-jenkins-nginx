@@ -47,11 +47,15 @@ pipeline {
     stage('Deploy to Prod') {
       steps {
         sh """
-          docker run --rm -v /opt/webapps:/opt/webapps -v /var/run/docker.sock:/var/run/docker.sock alpine sh -c "
-            apk add --no-cache docker-cli-compose &&
-            cd /opt/webapps/envs/prod &&
-            docker-compose pull wordpress &&
-            docker-compose up -d wordpress
+          docker run --rm \
+            -v /opt/webapps:/opt/webapps \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -e COMPOSE_PROJECT_NAME=prod \
+            alpine sh -c "
+              apk add --no-cache docker-cli-compose &&
+              cd /opt/webapps/envs/prod &&
+              docker-compose pull wordpress &&
+              docker-compose up -d wordpress
             "
         """
       }
