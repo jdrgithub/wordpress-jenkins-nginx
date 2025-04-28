@@ -33,12 +33,21 @@ pipeline {
         }
       }
     }
+
+    stage('Sync wp-content') {
+      steps {
+        sh """
+          docker run --rm -v /opt/webapps:/opt/webapps \
+             alpine sh -c "apk add --no-cache rsync && rsync -a --delete /opt/webapps/envs/dev/wp-content/ /opt/webapps/envs/prod/wp-content/"
+        """
+      }
+    }
+
   
     stage('Deploy to Prod') {
       steps {
         sh """
-          # Sync wp-content first (dev -> prod)
-          rsync -a --delete /opt/webapps/envs/dev/wp-content/ /opt/webapps/envs/prod/wp-content/
+          #rsync -a --delete /opt/webapps/envs/dev/wp-content/ /opt/webapps/envs/prod/wp-content/
 
           # Pull the latest WordPress image
           cd /opt/webapps/envs/prod

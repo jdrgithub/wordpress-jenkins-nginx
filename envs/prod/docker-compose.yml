@@ -29,6 +29,9 @@ services:
       - wordpress-net
 
   jenkins:
+    build:
+      context: /opt/webapps/
+      dockerfile: images/jenkins/Dockerfile
     image: jdrdock/jenkins-docker-enabled:latest
     user: root
     restart: always
