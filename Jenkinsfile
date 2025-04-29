@@ -14,6 +14,10 @@ pipeline {
     IMAGE_TAG = "build-${env.BUILD_NUMBER}"
     REGISTRY = "docker.io"
     REPO = "jdrdock"
+
+    // Use CHANGE_MESSAGE if set...otherwise, pull latest Git commit message
+    CHANGE_MESSAGE = "${params.CHANGE_MESSAGE ?: sh(script: 'git log -1 --pretty=%B', returnStdout: true).trim()}"
+
   }
 
   stages {
