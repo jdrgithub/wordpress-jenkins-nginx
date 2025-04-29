@@ -13,11 +13,12 @@ services:
     volumes:
       - /opt/webapps/wordpress/content:/var/www/html/wp-content
     networks:
-      - wordpress-net
+      - prod-net
 
   db:
     image: mysql:5.7
     restart: always
+    container_name: prod_db
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_PASSWORD: ${WORDPRESS_DB_PASSWORD}
@@ -26,7 +27,7 @@ services:
     volumes:
       - db_data:/var/lib/mysql
     networks:
-      - wordpress-net
+      - prod-net
 
   nginx:
     build:
@@ -36,17 +37,17 @@ services:
     restart: always
     command: /bin/sh -c "/etc/nginx/nginx-start.sh"
     ports:
-      - "80:80"
-      - "443:443"
+      - "192.168.1.171:80:80"
+      - "192.168.1.171:443:443"
     volumes:
       - /opt/webapps/nginx/nginx.prod.conf:/etc/nginx/nginx.conf
       - /etc/ssl/cloudflare:/etc/ssl/cloudflare:ro                                                                                                
     networks:
-      - wordpress-net
+      - prod-net
 
 volumes:
   db_data:
 
 networks:
-  wordpress-net:
-    name: prod-net
+  prod-net:
+    external: true

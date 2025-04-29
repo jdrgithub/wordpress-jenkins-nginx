@@ -3,7 +3,7 @@ version: "3.8"
 services:
   jenkins:
     build: 
-      context: /opt/webapps/jenkins
+      context: /opt/webapps
       dockerfile: /opt/webapps/images/jenkins/Dockerfile
     image: jenkins/jenkins-docker-enabled:latest
     container_name: jenkins
@@ -21,6 +21,6 @@ services:
       - 8080:8080
 
 networks:
-  default:
-    name: jenkins-net
+  jenkins-net:
+    external: true
 

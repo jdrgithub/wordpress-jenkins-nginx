@@ -44,6 +44,23 @@ pipeline {
       }
     }
 
+    stage('Promote Dev Database to Prod') {
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'mysql-root-password-id', usernameVariable: 'DB_USER', passwordVariable: 'DB_PASS')]) {
+          script {
+            def timestamp = new Date().format("yyyyMMdd-HHmmss")
+            sh """
+              # Backup Prod Database
+              docker exec prod_db mysqldump -u $DB_USER -p"$DB_PASS" wordpress > /opt/webapps/prod-db-backup-${timestamp}.sql
+
+              # Dump Dev DB and Import into Prod
+              docker exec dev_db mysqldump -u $DB_USER -p"$DB_PASS" wordpress | docker exec -i prod_db mysql -u $DB_USER -p"$DB_PASS" wordpress
+            """
+          }
+        }
+      }
+    }
+
     stage('Deploy to Prod') {
       steps {
         sh """
