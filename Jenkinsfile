@@ -30,7 +30,7 @@ pipeline {
           if (committerEmail == 'jenkins@nimbledev.io') {
             echo "🔁 Skipping build triggered by Jenkins auto-commit."
             currentBuild.result = 'SUCCESS'
-            error('Stopping build early because it was triggered by Jenkins auto-commit.')
+            return  // exit cleanly without error
           }
         }
       }
