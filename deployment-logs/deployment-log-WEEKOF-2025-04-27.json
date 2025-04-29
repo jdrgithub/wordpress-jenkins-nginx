@@ -258,5 +258,10 @@
     "timestamp": "2025-04-29T18:37:29Z",
     "image_tag": "build-101",
     "change_message": "adding block for triggering deploys only for non jenkins commits instead of log generation triggered by jenkins"
+  },
+  {
+    "timestamp": "2025-04-29T18:38:29Z",
+    "image_tag": "build-102",
+    "change_message": "Update deployment logs: auto-commit from Jenkins for build build-101"
   }
 ]
