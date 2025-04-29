@@ -133,6 +133,22 @@ pipeline {
         }
       }
     }
+
+    stage('Tag Deployment in Git') {
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'github-creds', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')]) {
+          sh """
+            cd /opt/webapps
+
+            # Create a Git tag for this deployment
+            git tag deploy-${IMAGE_TAG}
+
+            # Push the tag to GitHub
+            git push https://${GIT_USER}:${GIT_TOKEN}@github.com/jdrgithub/wordpress-jenkins-nginx.git deploy-${IMAGE_TAG}
+          """
+        }
+      }
+    }
   }
 }
 
