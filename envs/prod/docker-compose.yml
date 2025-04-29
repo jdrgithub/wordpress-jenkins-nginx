@@ -44,6 +44,8 @@ services:
       - /etc/ssl/cloudflare:/etc/ssl/cloudflare:ro                                                                                                
     networks:
       - prod-net
+    environment:
+      - NGINX_ENV=dev
 
 volumes:
   db_data:
