@@ -55,6 +55,11 @@ pipeline {
 
               # Dump Dev DB and Import into Prod
               docker exec dev_db mysqldump -u $DB_USER -p"$DB_PASS" wordpress | docker exec -i prod_db mysql -u $DB_USER -p"$DB_PASS" wordpress
+
+              # Fix siteurl and home URLs in Prod
+              docker exec -i prod_db mysql -u $DB_USER -p"$DB_PASS" wordpress -e "
+                UPDATE wp_options SET option_value = 'https://nimbledev.io' WHERE option_name IN ('siteurl', 'home');
+              "
             """
           }
         }
