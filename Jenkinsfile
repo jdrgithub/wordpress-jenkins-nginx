@@ -128,7 +128,7 @@ pipeline {
 
             git commit -m "Update deployment logs: auto-commit from Jenkins for build ${IMAGE_TAG}" || echo "No changes to commit"
 
-            git push https://${GIT_USER}:${GIT_TOKEN}@github.com/your-github-username/your-repo-name.git main
+            git push https://${GIT_USER}:${GIT_TOKEN}@github.com/jdrgithub/wordpress-jenkins-nginx.git main
           """
         }
       }
