@@ -1,6 +1,14 @@
 pipeline {
   agent any
 
+  parameters {
+    string(
+      name: 'CHANGE_MESSAGE',
+      defaultValue: 'No change message provided',
+      description: 'Enter the deployment change description'
+    )
+  }
+
   environment {
     IMAGE_NAME = "wordpress-astra"
     IMAGE_TAG = "build-${env.BUILD_NUMBER}"
@@ -72,6 +80,38 @@ pipeline {
           docker compose -f /opt/webapps/envs/prod/docker-compose.yml --project-name prod pull wordpress
           docker compose -f /opt/webapps/envs/prod/docker-compose.yml --project-name prod up -d wordpress
         """
+      }
+    }
+
+    stage('Update Weekly Deployment Log') {
+      steps {
+        script {
+          def timestamp = new Date().format("yyyy-MM-dd'T'HH:mm:ss'Z'")
+
+          // Calculate the starting Sunday for the current week
+          def now = new Date()
+          def dayOfWeek = now.format("u") as Integer  // Monday=1, Sunday=7
+          def sunday = new Date(now.time - (dayOfWeek % 7) * (1000 * 60 * 60 * 24))
+          def sundayStr = sunday.format("yyyy-MM-dd")
+
+          def logDir = "/opt/webapps/deployment-logs"
+          def logFile = "${logDir}/deployment-log-WEEKOF-${sundayStr}.json"
+
+          sh """
+            mkdir -p ${logDir}
+
+            # Initialize weekly log file if it doesn't exist
+            if [ ! -f ${logFile} ]; then
+              echo "[]" > ${logFile}
+            fi
+
+            # Create a temp JSON record
+            jq --arg ts "${timestamp}" --arg img "${IMAGE_TAG}" --arg msg "${CHANGE_MESSAGE}" '. += [{"timestamp":$ts,"image_tag":$img,"change_message":$msg}]' ${logFile} > /tmp/deployment-log.json
+
+            # Overwrite the weekly log file
+            mv /tmp/deployment-log.json ${logFile}
+          """
+        }
       }
     }
   }
