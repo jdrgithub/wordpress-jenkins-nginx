@@ -1,10 +1,22 @@
 #!/bin/bash
+set -e
+
+# Load DB_PASSWORD from .env file
+if [ -f /opt/webapps/scripts/.env ]; then
+  export $(cat /opt/webapps/scripts/.env | xargs)
+fi
+
+DB_CONTAINER_NAME="prod_db"
+DB_NAME="wordpress"
+DB_USER="wordpress"
+
+BACKUP_FILE="backup.sql.gz"
+
+docker exec "$DB_CONTAINER_NAME" sh -c "exec mysqldump -u$DB_USER -p$DB_PASSWORD $DB_NAME" | gzip > "$BACKUP_FILE"
+
 
 # === CONFIGURATION ===
 DB_CONTAINER_NAME="prod_db_1"   # name of your running MySQL container
-DB_USER="wordpress"             # database user
-DB_PASSWORD="yourpass"          # database password
-DB_NAME="wordpress"             # database name to backup
 BACKUP_DIR="/opt/webapps/backups/mysql"  # where you want backups to live
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 BACKUP_FILE="$BACKUP_DIR/wordpress_backup_$TIMESTAMP.sql.gz"
@@ -22,6 +34,6 @@ docker exec "$DB_CONTAINER_NAME" sh -c "exec mysqldump -u$DB_USER -p$DB_PASSWORD
 if [ -f "$BACKUP_FILE" ]; then
     echo "✅ Backup successful: $BACKUP_FILE"
 else
-    echo "❌ Backup failed."
+    echo "Backup failed."
 fi
 

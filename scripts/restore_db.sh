@@ -3,7 +3,6 @@
 # === CONFIGURATION ===
 DB_CONTAINER_NAME="prod_db_1"  # name of your running MySQL container
 DB_USER="wordpress"            # database user
-DB_PASSWORD="yourpass"          # database password
 DB_NAME="wordpress"             # database name to restore into
 BACKUP_DIR="/opt/webapps/backups/mysql"  # where your backups are stored
 
@@ -21,14 +20,14 @@ FULL_BACKUP_PATH="$BACKUP_DIR/$BACKUP_FILE"
 
 # Validate file exists
 if [ ! -f "$FULL_BACKUP_PATH" ]; then
-  echo "❌ Backup file does not exist: $FULL_BACKUP_PATH"
+  echo "Backup file does not exist: $FULL_BACKUP_PATH"
   exit 1
 fi
 
 # Confirm with user
 read -p "⚠️  WARNING: This will overwrite your current '$DB_NAME' database. Continue? (yes/no): " CONFIRM
 if [ "$CONFIRM" != "yes" ]; then
-  echo "❌ Restore cancelled."
+  echo "Restore cancelled."
   exit 1
 fi
 
