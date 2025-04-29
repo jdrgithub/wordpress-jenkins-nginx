@@ -106,7 +106,7 @@ pipeline {
             fi
 
             # Create a temp JSON record
-            jq --arg ts "${timestamp}" --arg img "${IMAGE_TAG}" --arg msg "${CHANGE_MESSAGE}" '. += [{"timestamp":$ts,"image_tag":$img,"change_message":$msg}]' ${logFile} > /tmp/deployment-log.json
+            jq --arg ts "${timestamp}" --arg img "${IMAGE_TAG}" --arg msg "${CHANGE_MESSAGE}" '. += [{"timestamp":\$ts,"image_tag":\$img,"change_message":\$msg}]' ${logFile} > /tmp/deployment-log.json
 
             # Overwrite the weekly log file
             mv /tmp/deployment-log.json ${logFile}
