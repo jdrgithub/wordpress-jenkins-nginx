@@ -23,6 +23,19 @@ pipeline {
       }
     }
 
+    stage('Skip Jenkins Auto-Commits') {
+      steps {
+        script {
+          def committerEmail = sh(script: "git log -1 --pretty=format:'%ae'", returnStdout: true).trim()
+          if (committerEmail == 'jenkins@nimbledev.io') {
+            echo "🔁 Skipping build triggered by Jenkins auto-commit."
+            currentBuild.result = 'SUCCESS'
+            error('Stopping build early because it was triggered by Jenkins auto-commit.')
+          }
+        }
+      }
+    }
+
     stage('Determine Change Message') {
       steps {
         script {
