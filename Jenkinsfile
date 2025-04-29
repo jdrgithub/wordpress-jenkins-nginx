@@ -14,16 +14,24 @@ pipeline {
     IMAGE_TAG = "build-${env.BUILD_NUMBER}"
     REGISTRY = "docker.io"
     REPO = "jdrdock"
-
-    // Use CHANGE_MESSAGE if set...otherwise, pull latest Git commit message
-    CHANGE_MESSAGE = "${params.CHANGE_MESSAGE ?: sh(script: 'git log -1 --pretty=%B', returnStdout: true).trim()}"
-
   }
 
   stages {
     stage('Checkout') {
       steps {
         checkout scm
+      }
+    }
+
+    stage('Determine Change Message') {
+      steps {
+        script {
+          if (!params.CHANGE_MESSAGE || params.CHANGE_MESSAGE == 'No change message provided') {
+            env.CHANGE_MESSAGE = sh(script: 'git log -1 --pretty=%B', returnStdout: true).trim()
+          } else {
+            env.CHANGE_MESSAGE = params.CHANGE_MESSAGE
+          }
+        }
       }
     }
 
@@ -62,13 +70,8 @@ pipeline {
           script {
             def timestamp = new Date().format("yyyyMMdd-HHmmss")
             sh """
-              # Backup Prod Database
               docker exec prod_db mysqldump -u $DB_USER -p"$DB_PASS" wordpress > /opt/webapps/prod-db-backup-${timestamp}.sql
-
-              # Dump Dev DB and Import into Prod
               docker exec dev_db mysqldump -u $DB_USER -p"$DB_PASS" wordpress | docker exec -i prod_db mysql -u $DB_USER -p"$DB_PASS" wordpress
-
-              # Fix siteurl and home URLs in Prod
               docker exec -i prod_db mysql -u $DB_USER -p"$DB_PASS" wordpress -e "
                 UPDATE wp_options SET option_value = 'https://nimbledev.io' WHERE option_name IN ('siteurl', 'home');
               "
@@ -91,8 +94,6 @@ pipeline {
       steps {
         script {
           def timestamp = new Date().format("yyyy-MM-dd'T'HH:mm:ss'Z'")
-
-          // Calculate the starting Sunday for the current week
           def now = new Date()
           def dayOfWeek = now.format("u") as Integer  // Monday=1, Sunday=7
           def sunday = new Date(now.time - (dayOfWeek % 7) * (1000 * 60 * 60 * 24))
@@ -103,16 +104,10 @@ pipeline {
 
           sh """
             mkdir -p ${logDir}
-
-            # Initialize weekly log file if it doesn't exist
             if [ ! -f ${logFile} ]; then
               echo "[]" > ${logFile}
             fi
-
-            # Create a temp JSON record
             jq --arg ts "${timestamp}" --arg img "${IMAGE_TAG}" --arg msg "${CHANGE_MESSAGE}" '. += [{"timestamp":\$ts,"image_tag":\$img,"change_message":\$msg}]' ${logFile} > /tmp/deployment-log.json
-
-            # Overwrite the weekly log file
             mv /tmp/deployment-log.json ${logFile}
           """
         }
@@ -124,14 +119,10 @@ pipeline {
         withCredentials([usernamePassword(credentialsId: 'github-creds', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')]) {
           sh """
             cd /opt/webapps
-
             git config user.name "Jenkins CI"
             git config user.email "jenkins@nimbledev.io"
-
             git add deployment-logs/
-
             git commit -m "Update deployment logs: auto-commit from Jenkins for build ${IMAGE_TAG}" || echo "No changes to commit"
-
             git push https://${GIT_USER}:${GIT_TOKEN}@github.com/jdrgithub/wordpress-jenkins-nginx.git main
           """
         }
@@ -143,11 +134,7 @@ pipeline {
         withCredentials([usernamePassword(credentialsId: 'github-creds', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')]) {
           sh """
             cd /opt/webapps
-
-            # Create a Git tag for this deployment
             git tag deploy-${IMAGE_TAG}
-
-            # Push the tag to GitHub
             git push https://${GIT_USER}:${GIT_TOKEN}@github.com/jdrgithub/wordpress-jenkins-nginx.git deploy-${IMAGE_TAG}
           """
         }
