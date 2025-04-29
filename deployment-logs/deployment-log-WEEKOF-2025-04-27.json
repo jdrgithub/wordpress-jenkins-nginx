@@ -13,5 +13,10 @@
     "timestamp": "2025-04-29T14:39:02Z",
     "image_tag": "build-50",
     "change_message": "testing fixed github params"
+  },
+  {
+    "timestamp": "2025-04-29T14:49:46Z",
+    "image_tag": "build-51",
+    "change_message": "added git tagging for rollbacks"
   }
 ]
