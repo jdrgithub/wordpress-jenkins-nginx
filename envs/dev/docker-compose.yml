@@ -39,8 +39,8 @@ services:
     restart: always
     command: /bin/sh -c "/etc/nginx/nginx-start.sh"
     ports:
-      - "192.168.1.178:80:80"
-      - "192.168.1.178:443:443"
+      - "${HOST_LAN_IP}:80:80"
+      - "${HOST_LAN_IP}:443:443"
     volumes:
       - /opt/webapps/nginx/nginx.dev.conf:/etc/nginx/nginx.conf
       - /etc/ssl/cloudflare:/etc/ssl/cloudflare:ro
@@ -48,6 +48,7 @@ services:
       - dev-net
     environments:
       - NGINX_ENV=dev
+      - HOST_LAN_IP=${HOST_LAN_IP}
 
 networks:
   dev-net:

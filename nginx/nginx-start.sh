@@ -10,7 +10,7 @@ else
 fi
 
 # Substitute environment variables and start nginx
-envsubst '$TRUSTED_LAN' < $TEMPLATE_CONF > /etc/nginx/nginx.conf
+envsubst '$TRUSTED_LAN $HOST_LAN_IP' < $TEMPLATE_CONF > /etc/nginx/nginx.conf
 nginx -c /etc/nginx/nginx.conf -g 'daemon off;'
 
 
