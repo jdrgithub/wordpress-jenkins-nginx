@@ -8,5 +8,10 @@
     "timestamp": "2025-04-29T14:35:41Z",
     "image_tag": "build-49",
     "change_message": "test build 4"
+  },
+  {
+    "timestamp": "2025-04-29T14:39:02Z",
+    "image_tag": "build-50",
+    "change_message": "testing fixed github params"
   }
 ]
