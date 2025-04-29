@@ -114,6 +114,25 @@ pipeline {
         }
       }
     }
+
+    stage('Commit and Push Deployment Log') {
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'github-creds', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_TOKEN')]) {
+          sh """
+            cd /opt/webapps
+
+            git config user.name "Jenkins CI"
+            git config user.email "jenkins@nimbledev.io"
+
+            git add deployment-logs/
+
+            git commit -m "Update deployment logs: auto-commit from Jenkins for build ${IMAGE_TAG}" || echo "No changes to commit"
+
+            git push https://${GIT_USER}:${GIT_TOKEN}@github.com/your-github-username/your-repo-name.git main
+          """
+        }
+      }
+    }
   }
 }
 
