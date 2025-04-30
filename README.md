@@ -68,7 +68,19 @@ All deployments are logged weekly by timestamp and build tag.
 This repository is designed to run from `/opt/webapps/` with Docker Compose and Jenkins installed. You can replicate the system using:
 
 ```bash
+Customize:
+/opt/webapps/Jenkinsfile
+/opt/webapps/env/dev/.env
+/opt/webapps/env/prod/.env
+/opt/webapps/env/dev/docker.compose.yml
+/opt/webapps/env/prod/docker.compose.yml
+/opt/webapps/nginx/nginx.dev.conf
+/opt/webapps/nginx/nginx.prod.conf
+
+Execute:
 cd /opt/webapps/envs/dev
+docker compose up -d
+cd /opt/webapps/envs/prod
 docker compose up -d
 ```
 
