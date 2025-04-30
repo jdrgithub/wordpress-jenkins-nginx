@@ -15,6 +15,8 @@ services:
       - dev-net
     volumes:
       - /opt/webapps/wordpress/content:/var/www/html/wp-content
+    extra_hosts:
+      - "dev.nimbledev.io:127.0.0.1"
 
   db:
     container_name: dev_db
@@ -39,14 +41,14 @@ services:
     restart: always
     command: /bin/sh -c "/etc/nginx/nginx-start.sh"
     ports:
-      - "${HOST_LAN_IP}:80:80"
-      - "${HOST_LAN_IP}:443:443"
+      - '${HOST_LAN_IP}:80:80'
+      - '${HOST_LAN_IP}:443:443'
     volumes:
       - /opt/webapps/nginx/nginx.dev.conf:/etc/nginx/nginx.conf
       - /etc/ssl/cloudflare:/etc/ssl/cloudflare:ro
     networks:
       - dev-net
-    environments:
+    environment:
       - NGINX_ENV=dev
       - HOST_LAN_IP=${HOST_LAN_IP}
 
