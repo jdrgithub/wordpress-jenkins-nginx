@@ -40,12 +40,11 @@ services:
       - "${HOST_LAN_IP}:80:80"
       - "${HOST_LAN_IP}:443:443"
     volumes:
-      - /opt/webapps/nginx/nginx.prod.conf:/etc/nginx/nginx.conf
       - /etc/ssl/cloudflare:/etc/ssl/cloudflare:ro                                                                                                
     networks:
       - prod-net
     environment:
-      - NGINX_ENV=dev
+      - NGINX_ENV=prod
       - HOST_LAN_IP=${HOST_LAN_IP}
 
 volumes:
