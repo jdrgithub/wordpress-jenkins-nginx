@@ -65,12 +65,11 @@ pipeline {
               apk add --no-cache rsync 
               rsync -a --no-perms --no-owner --no-group --delete /opt/webapps/envs/dev/wp-content/ /opt/webapps/envs/prod/wp-content/ || echo "rsync failed" 
               chown -R 33:33 /opt/webapps/envs/prod/wp-content
+              echo "Chowning content to 33:33"
+              echo 'Rewriting dev.nimbledev.io URLs in dev wp-content before syncing to prod...'
+              find /opt/webapps/envs/prod/wp-content/uploads/elementor -type f -exec sed -i 's|https://dev.nimbledev.io|https://nimbledev.io|g' {} +
             '
 
-          echo "Chowning content to 33:33"
-
-          echo 'Rewriting dev.nimbledev.io URLs in dev wp-content before syncing to prod...'
-          find /opt/webapps/envs/prod/wp-content/uploads/elementor -type f -exec sed -i 's|https://dev.nimbledev.io|https://nimbledev.io|g' {} +
 
           echo '🔁 Flushing Elementor cache in production...'
           docker exec prod_wordpress wp elementor flush_css --allow-root || echo " Elementor not found or flush failed"
