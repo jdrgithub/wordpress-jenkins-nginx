@@ -64,6 +64,10 @@ pipeline {
 
           echo 'Rewriting dev.nimbledev.io URLs in dev wp-content before syncing to prod...'
           find /opt/webapps/envs/prod/wp-content/uploads/elementor -type f -exec sed -i 's|https://dev.nimbledev.io|https://nimbledev.io|g' {} +
+
+          echo '🔁 Flushing Elementor cache in production...'
+          docker exec prod_wordpress wp elementor flush_css --allow-root || echo " Elementor not found or flush failed"
+          docker exec prod_wordpress wp cache flush --allow-root || echo "WP cache flush failed"
         """
       }
     }
