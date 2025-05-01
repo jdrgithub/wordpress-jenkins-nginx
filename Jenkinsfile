@@ -97,6 +97,10 @@ pipeline {
       }
     }
 
+    // This needs to happen after deployment.
+    // Elementor is introducing dynamically generated references to dev that breaks SSL handshake.
+    // The wp search-replace needs to be recursive and look at all tables
+
     stage('Finalize Prod Cleanup') {
       steps {
         sh """
