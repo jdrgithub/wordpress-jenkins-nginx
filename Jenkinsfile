@@ -62,8 +62,8 @@ pipeline {
             -v /opt/webapps:/opt/webapps \
             alpine sh -c '
               set -e              
-              apk add --no-cache rsync && \
-              rsync -a --no-perms --no-owner --no-group --delete /opt/webapps/envs/dev/wp-content/ /opt/webapps/envs/prod/wp-content/ || echo "rsync failed" && \ 
+              apk add --no-cache rsync 
+              rsync -a --no-perms --no-owner --no-group --delete /opt/webapps/envs/dev/wp-content/ /opt/webapps/envs/prod/wp-content/ || echo "rsync failed" 
               chown -R 33:33 /opt/webapps/envs/prod/wp-content
             '
 
