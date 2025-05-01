@@ -58,14 +58,16 @@ pipeline {
       steps {
         sh """
           echo 'Syncing wp-content from dev to prod...'
-          docker run --rm \
+          docker run --rm --user root \
             -v /opt/webapps:/opt/webapps \
             alpine sh -c '
               set -e              
               apk add --no-cache rsync && \
-              rsync -a --no-perms --no-owner --no-group --delete /opt/webapps/envs/dev/wp-content/ /opt/webapps/envs/prod/wp-content/ || echo "rsync failed"
+              rsync -a --no-perms --no-owner --no-group --delete /opt/webapps/envs/dev/wp-content/ /opt/webapps/envs/prod/wp-content/ || echo "rsync failed" && \ 
+              chown -R 33:33 /opt/webapps/envs/prod/wp-content
             '
-          
+
+          echo "Chowning content to 33:33"
 
           echo 'Rewriting dev.nimbledev.io URLs in dev wp-content before syncing to prod...'
           find /opt/webapps/envs/prod/wp-content/uploads/elementor -type f -exec sed -i 's|https://dev.nimbledev.io|https://nimbledev.io|g' {} +
