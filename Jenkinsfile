@@ -66,10 +66,12 @@ pipeline {
               rsync -a --no-perms --no-owner --no-group --delete /opt/webapps/envs/dev/wp-content/ /opt/webapps/envs/prod/wp-content/ || echo "rsync failed" 
               chown -R 33:33 /opt/webapps/envs/prod/wp-content
               echo "Chowning content to 33:33"
-              echo 'Rewriting dev.nimbledev.io URLs in dev wp-content before syncing to prod...'
+              echo "Rewriting dev.nimbledev.io URLs in dev wp-content before syncing to prod..."
               find /opt/webapps/envs/prod/wp-content/uploads/elementor -type f -exec sed -i "s|https://dev.nimbledev.io|https://nimbledev.io|g" {} + 2>&1 || echo "No subsitutions needed for dev.nimbledev.io or permissions denied."
             '
 
+          echo 'Running database search-replace from dev to prod...'
+          docker exec wordpress wp search-replace 'https://dev.nimbledev.io' 'https://nimbledev.io' --allow-root || echo "Search-replace failed or not needed"
 
           echo '🔁 Flushing Elementor cache in production...'
           docker exec wordpress wp elementor flush_css --allow-root || echo " Elementor not found or flush failed"
