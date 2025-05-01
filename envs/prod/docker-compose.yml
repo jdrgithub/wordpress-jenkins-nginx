@@ -11,7 +11,7 @@ services:
       WORDPRESS_DB_PASSWORD: ${WORDPRESS_DB_PASSWORD}
       WORDPRESS_DB_NAME: wordpress
     volumes:
-      - /opt/webapps/wordpress/content:/var/www/html/wp-content
+      - /opt/webapps/envs/prod/wp-content:/var/www/html/wp-content
     networks:
       - prod-net
 

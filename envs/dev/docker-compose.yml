@@ -14,7 +14,7 @@ services:
     networks:
       - dev-net
     volumes:
-      - /opt/webapps/wordpress/content:/var/www/html/wp-content
+      - /opt/webapps/envs/dev/wp-content:/var/www/html/wp-content
     extra_hosts:
       - "dev.nimbledev.io:127.0.0.1"
 
