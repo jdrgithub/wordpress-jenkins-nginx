@@ -72,8 +72,8 @@ pipeline {
 
 
           echo '🔁 Flushing Elementor cache in production...'
-          docker exec prod_wordpress wp elementor flush_css --allow-root || echo " Elementor not found or flush failed"
-          docker exec prod_wordpress wp cache flush --allow-root || echo "WP cache flush failed"
+          docker exec wordpress wp elementor flush_css --allow-root || echo " Elementor not found or flush failed"
+          docker exec wordpress wp cache flush --allow-root || echo "WP cache flush failed"
         """
       }
     }
