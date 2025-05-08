@@ -54,6 +54,16 @@ pipeline {
       }
     }
 
+    stage('Export Media Metadata from Dev') {
+      steps {
+        sh """
+          echo 'Exporting media metadata from dev...'
+          mkdir -p /opt/webapps/envs/dev/wp-content/tmp
+          docker exec dev_wordpress wp export --post_type=attachment --dir=/var/www/html/wp-content/tmp --filename_format=media-export.xml --allow-root
+        """
+      }
+    }
+
     stage('Sync wp-content') {
       steps {
         sh """
@@ -71,14 +81,11 @@ pipeline {
       }
     }
 
-    stage('Promote Media Metadata') {
+    stage('Import Media Metadata to Prod') {
       steps {
         sh """
-          echo 'Exporting media metadata from dev...'
-          docker exec dev_wordpress wp export --post_type=attachment --dir=/opt/webapps/tmp --filename_format=media-export.xml --allow-root
-
           echo 'Importing media metadata to prod...'
-          docker exec wordpress import /opt/webapps/tmp/media-export.xml --authors=create --allow-root || echo 'Import failed or not needed'
+          docker exec wordpress wp import /var/www/html/wp-content/tmp/media-export.xml --authors=create --allow-root || echo 'Import failed or not needed'
         """
       }
     }
