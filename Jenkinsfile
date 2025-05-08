@@ -75,10 +75,10 @@ pipeline {
       steps {
         sh """
           echo 'Exporting media metadata from dev...'
-          docker exec dev_wp wp export --post_type=attachment --dir=/opt/webapps/tmp --filename_format=media-export.xml --allow-root
+          docker exec dev_wordpress wp export --post_type=attachment --dir=/opt/webapps/tmp --filename_format=media-export.xml --allow-root
 
           echo 'Importing media metadata to prod...'
-          docker exec prod_wp wp import /opt/webapps/tmp/media-export.xml --authors=create --allow-root || echo 'Import failed or not needed'
+          docker exec wordpress import /opt/webapps/tmp/media-export.xml --authors=create --allow-root || echo 'Import failed or not needed'
         """
       }
     }
