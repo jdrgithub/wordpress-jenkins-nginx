@@ -54,16 +54,6 @@ pipeline {
       }
     }
 
-    stage('Export Media Metadata from Dev') {
-      steps {
-        sh """
-          echo 'Exporting media metadata from dev...'
-          mkdir -p /opt/webapps/envs/dev/wp-content/tmp
-          docker exec dev_wordpress wp export --post_type=attachment --dir=/var/www/html/wp-content/tmp --filename_format=media-export.xml --allow-root
-        """
-      }
-    }
-
     stage('Sync wp-content') {
       steps {
         sh """
@@ -81,15 +71,6 @@ pipeline {
       }
     }
 
-    stage('Import Media Metadata to Prod') {
-      steps {
-        sh """
-          echo 'Importing media metadata to prod...'
-          docker exec wordpress wp import /var/www/html/wp-content/tmp/media-export.xml --authors=create --allow-root || echo 'Import failed or not needed'
-        """
-      }
-    }
-
     stage('Promote Dev Database to Prod') {
       steps {
         withCredentials([usernamePassword(credentialsId: 'mysql-root-password-id', usernameVariable: 'DB_USER', passwordVariable: 'DB_PASS')]) {
@@ -100,6 +81,8 @@ pipeline {
               docker exec dev_db mysqldump -u $DB_USER -p"$DB_PASS" wordpress | docker exec -i prod_db mysql -u $DB_USER -p"$DB_PASS" wordpress
               docker exec -i prod_db mysql -u $DB_USER -p"$DB_PASS" wordpress -e "
                 UPDATE wp_options SET option_value = 'https://nimbledev.io' WHERE option_name IN ('siteurl', 'home');
+              docker exec wordpress wp search-replace 'https://dev.nimbledev.io' 'https://nimbledev.io' --recurse-objects --all-tables --allow-root
+
               "
             """
           }
@@ -121,8 +104,6 @@ pipeline {
         sh """
           echo '🔁 Final rewrite and cache flush on live production site...'
           docker exec wordpress find /var/www/html/wp-content/uploads/elementor -type f -exec sed -i "s|https://dev.nimbledev.io|https://nimbledev.io|g" {} + 2>&1 || echo "No substitutions needed or permissions denied."
-
-          docker exec wordpress wp search-replace 'https://dev.nimbledev.io' 'https://nimbledev.io' --skip-columns=guid --recurse-objects --all-tables --allow-root || echo "Search-replace failed or not needed"
 
           docker exec wordpress wp elementor flush_css --allow-root || echo "Elementor flush failed"
           docker exec wordpress wp cache flush --allow-root || echo "WP cache flush failed"
