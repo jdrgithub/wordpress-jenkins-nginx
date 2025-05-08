@@ -82,7 +82,7 @@ pipeline {
               docker exec -i prod_db mysql -u $DB_USER -p"$DB_PASS" wordpress -e "
                 UPDATE wp_options SET option_value = 'https://nimbledev.io' WHERE option_name IN ('siteurl', 'home');
                 "
-              docker exec wordpress wp search-replace 'https://dev.nimbledev.io' 'https://nimbledev.io' --precise --recurse-objects --all-tables --allow-root
+              docker exec wordpress wp search-replace 'https://dev.nimbledev.io' 'https://nimbledev.io' --precise --skip-columns --recurse-objects --all-tables --allow-root
             """
           }
         }
