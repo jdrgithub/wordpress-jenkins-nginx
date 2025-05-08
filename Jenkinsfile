@@ -71,6 +71,18 @@ pipeline {
       }
     }
 
+    stage('Promote Media Metadata') {
+      steps {
+        sh """
+          echo 'Exporting media metadata from dev...'
+          docker exec dev_wp wp export --post_type=attachment --dir=/opt/webapps/tmp --filename_format=media-export.xml --allow-root
+
+          echo 'Importing media metadata to prod...'
+          docker exec prod_wp wp import /opt/webapps/tmp/media-export.xml --authors=create --allow-root || echo 'Import failed or not needed'
+        """
+      }
+    }
+
     stage('Promote Dev Database to Prod') {
       steps {
         withCredentials([usernamePassword(credentialsId: 'mysql-root-password-id', usernameVariable: 'DB_USER', passwordVariable: 'DB_PASS')]) {
@@ -96,10 +108,6 @@ pipeline {
         """
       }
     }
-
-    // This needs to happen after deployment.
-    // Elementor is introducing dynamically generated references to dev that breaks SSL handshake.
-    // The wp search-replace needs to be recursive and look at all tables
 
     stage('Finalize Prod Cleanup') {
       steps {
