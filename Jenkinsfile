@@ -156,7 +156,7 @@ PHP
             git config user.name "Jenkins CI"
             git config user.email "jenkins@nimbledev.io"
             git fetch origin main
-            git rebase origin/main || echo 'Rebase failed or not needed
+            git rebase origin/main || echo 'Rebase failed or not needed'
             git add deployment-logs/
             git commit -m "Update deployment logs: auto-commit from Jenkins for build ${IMAGE_TAG}" || echo "No changes to commit"
             git push https://${GIT_USER}:${GIT_TOKEN}@github.com/jdrgithub/wordpress-jenkins-nginx.git main
