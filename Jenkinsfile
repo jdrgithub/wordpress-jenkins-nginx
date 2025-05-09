@@ -104,20 +104,23 @@ pipeline {
 
     stage('Replace Elementor Image URLs') {
       steps {
-        sh """
-          echo 'Fixing Elementor image URLs...'
+        sh '''
+          echo "Fixing Elementor image URLs..."
           docker exec dev_wordpress wp post meta get 17 _elementor_data --format=json --allow-root > /opt/webapps/envs/dev/wp-content/tmp/_elementor_data.json
           jq -r 'fromjson' /opt/webapps/envs/dev/wp-content/tmp/_elementor_data.json > /opt/webapps/envs/dev/wp-content/tmp/_elementor_data_decoded.json
           sed -i 's|dev.nimbledev.io|nimbledev.io|g' /opt/webapps/envs/dev/wp-content/tmp/_elementor_data_decoded.json
           jq -R -s '.' /opt/webapps/envs/dev/wp-content/tmp/_elementor_data_decoded.json > /opt/webapps/envs/prod/wp-content/tmp/_elementor_data.json
-          docker exec wordpress wp eval $'\
-            $raw = file_get_contents("/var/www/html/wp-content/tmp/_elementor_data.json");\
-            $data = json_decode($raw, true);\
-            if (is_string($data)) $data = json_decode($data, true);\
-            update_post_meta(17, "_elementor_data", $data);\
-          ' --allow-root
 
-        """
+          docker exec wordpress wp eval "$(
+            cat <<'PHP'
+$raw = file_get_contents("/var/www/html/wp-content/tmp/_elementor_data.json");
+$data = json_decode($raw, true);
+if (is_string($data)) $data = json_decode($data, true);
+update_post_meta(17, "_elementor_data", $data);
+PHP
+          )" --allow-root
+        '''
+
       }
     }
 
