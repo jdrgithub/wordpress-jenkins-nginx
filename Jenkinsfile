@@ -106,7 +106,12 @@ pipeline {
       steps {
         sh '''
           echo "Fixing Elementor image URLs..."
-          docker exec dev_wordpress wp post meta get 17 _elementor_data --format=json --allow-root > /opt/webapps/envs/dev/wp-content/tmp/_elementor_data.json
+          # Write the JSON export inside the container to a temp file
+          docker exec dev_wordpress sh -c 'wp post meta get 17 _elementor_data --format=json --allow-root > /var/www/html/wp-content/tmp/_elementor_data.json'
+
+          # Copy it out to the host
+          docker cp dev_wordpress:/var/www/html/wp-content/tmp/_elementor_data.json /opt/webapps/envs/dev/wp-content/tmp/_elementor_data.json
+
           jq -r 'fromjson' /opt/webapps/envs/dev/wp-content/tmp/_elementor_data.json > /opt/webapps/envs/dev/wp-content/tmp/_elementor_data_decoded.json
           sed -i 's|dev.nimbledev.io|nimbledev.io|g' /opt/webapps/envs/dev/wp-content/tmp/_elementor_data_decoded.json
           jq -R -s '.' /opt/webapps/envs/dev/wp-content/tmp/_elementor_data_decoded.json > /opt/webapps/envs/prod/wp-content/tmp/_elementor_data.json
