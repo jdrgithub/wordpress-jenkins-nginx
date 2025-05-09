@@ -80,7 +80,7 @@ pipeline {
               set -eu
               set -x
 
-              rm /opt/webapps/prod-db-backup-*
+              rm /opt/webapps/prod-db-backup-* || true
               echo 'Backing up prod DB to /opt/webapps/prod-db-backup-${timestamp}.sql'
               docker exec prod_db mysqldump -u "$DB_USER" -p"$DB_PASS" wordpress > /opt/webapps/prod-db-backup-${timestamp}.sql
 
