@@ -113,7 +113,7 @@ pipeline {
           jq -r 'fromjson' /opt/webapps/envs/dev/wp-content/tmp/_elementor_data.json > /tmp/_elementor_data_decoded.json
           sed -i 's|dev.nimbledev.io|nimbledev.io|g' /tmp/_elementor_data_decoded.json
           jq -R -s '.' /tmp/_elementor_data_decoded.json > /tmp/_elementor_data.json
-          cp /tmp/_elementor_data.json /opt/webapps/envs/prod/wp-content/_elementor_data.json
+          docker cp /tmp/_elementor_data.json wordpress:/var/www/html/wp-content/tmp/_elementor_data.json
           docker exec wordpress wp eval "$(
             cat <<'PHP'
 $raw = file_get_contents("/var/www/html/wp-content/tmp/_elementor_data.json");
