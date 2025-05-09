@@ -78,14 +78,36 @@ pipeline {
             def timestamp = new Date().format("yyyyMMdd-HHmmss")
             sh """
               docker exec prod_db mysqldump -u $DB_USER -p"$DB_PASS" wordpress > /opt/webapps/prod-db-backup-${timestamp}.sql
-              docker exec dev_db mysqldump -u $DB_USER -p"$DB_PASS" wordpress | docker exec -i prod_db mysql -u $DB_USER -p"$DB_PASS" wordpress
+              docker exec dev_db mysqldump -u $DB_USER -p"$DB_PASS" wordpress | docker exec -i prod_db mysql -u $DB_USER -p"$DB_PASS" wordpress    
               docker exec -i prod_db mysql -u $DB_USER -p"$DB_PASS" wordpress -e "
                 UPDATE wp_options SET option_value = 'https://nimbledev.io' WHERE option_name IN ('siteurl', 'home');
-                "
+              "
               docker exec wordpress wp search-replace 'https://dev.nimbledev.io' 'https://nimbledev.io' --precise --skip-columns --recurse-objects --all-tables --allow-root
             """
           }
         }
+      }
+    }
+
+    // This is for a specific problem with how an image loads after promotion to prod
+    // I am not sure why this happens to this image only. 
+    // It could be an artifact resulting from using a template
+    // Basically you decode the json from elementor about the home page and then use sed to get rid of dev reference and import to prod
+    stage('Replace Elementor Image URLs') {
+      steps {
+        sh """
+          echo 'Fixing Elementor image URLs...'
+          docker exec dev_wordpress wp post meta get 17 _elementor_data --format=json --allow-root > /opt/webapps/envs/dev/wp-content/tmp/_elementor_data.json
+          jq -r 'fromjson' /opt/webapps/envs/dev/wp-content/tmp/_elementor_data.json > /opt/webapps/envs/dev/wp-content/tmp/_elementor_data_decoded.json
+          sed -i 's|dev.nimbledev.io|nimbledev.io|g' /opt/webapps/envs/dev/wp-content/tmp/_elementor_data_decoded.json
+          jq -R -s '.' /opt/webapps/envs/dev/wp-content/tmp/_elementor_data_decoded.json > /opt/webapps/envs/prod/wp-content/tmp/_elementor_data.json
+          docker exec wordpress wp eval '
+            $raw = file_get_contents("/var/www/html/wp-content/tmp/_elementor_data.json");
+            $data = json_decode($raw, true);
+            if (is_string($data)) $data = json_decode($data, true);
+            update_post_meta(17, "_elementor_data", $data);
+          ' --allow-root
+        """
       }
     }
 
