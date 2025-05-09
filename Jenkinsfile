@@ -77,7 +77,8 @@ pipeline {
           script {
             def timestamp = new Date().format("yyyyMMdd-HHmmss")
             sh """
-              set -euxo pipefail
+              set -eu
+              set -x
 
               rm /opt/webapps/prod-db-backup-*
               echo 'Backing up prod DB to /opt/webapps/prod-db-backup-${timestamp}.sql'
