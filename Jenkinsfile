@@ -110,12 +110,13 @@ pipeline {
           jq -r 'fromjson' /opt/webapps/envs/dev/wp-content/tmp/_elementor_data.json > /opt/webapps/envs/dev/wp-content/tmp/_elementor_data_decoded.json
           sed -i 's|dev.nimbledev.io|nimbledev.io|g' /opt/webapps/envs/dev/wp-content/tmp/_elementor_data_decoded.json
           jq -R -s '.' /opt/webapps/envs/dev/wp-content/tmp/_elementor_data_decoded.json > /opt/webapps/envs/prod/wp-content/tmp/_elementor_data.json
-          docker exec wordpress wp eval '
-            $raw = file_get_contents("/var/www/html/wp-content/tmp/_elementor_data.json");
-            $data = json_decode($raw, true);
-            if (is_string($data)) $data = json_decode($data, true);
-            update_post_meta(17, "_elementor_data", $data);
+          docker exec wordpress wp eval $'\
+            $raw = file_get_contents("/var/www/html/wp-content/tmp/_elementor_data.json");\
+            $data = json_decode($raw, true);\
+            if (is_string($data)) $data = json_decode($data, true);\
+            update_post_meta(17, "_elementor_data", $data);\
           ' --allow-root
+
         """
       }
     }
