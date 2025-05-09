@@ -43,7 +43,7 @@ pipeline {
 
     stage('Push to Docker Hub') {
       steps {
-        withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+        withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {  
           sh """
             echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin $REGISTRY
             docker tag ${REPO}/${IMAGE_NAME}:${IMAGE_TAG} ${REPO}/${IMAGE_NAME}:latest
@@ -73,13 +73,14 @@ pipeline {
 
     stage('Promote Dev Database to Prod') {
       steps {
-        withCredentials([usernamePassword(credentialsId: 'mysql-root-password-id', usernameVariable: 'DB_USER', passwordVariable: 'DB_PASS')]) {
+        withCredentials([usernamePassword(credentialsId: 'mysql-root-password-id', usernameVariable: 'DB_USER', passwordVariable: 'DB_PASS')]) {   
           script {
             def timestamp = new Date().format("yyyyMMdd-HHmmss")
             sh """
               docker exec prod_db mysqldump -u $DB_USER -p"$DB_PASS" wordpress > /opt/webapps/prod-db-backup-${timestamp}.sql
-              docker exec dev_db mysqldump -u $DB_USER -p"$DB_PASS" wordpress | docker exec -i prod_db mysql -u $DB_USER -p"$DB_PASS" wordpress    
-              docker exec -i prod_db mysql -u $DB_USER -p"$DB_PASS" wordpress -e \"UPDATE wp_options SET option_value = 'https://nimbledev.io' WHERE option_name IN ('siteurl', 'home');\"
+              docker exec dev_db mysqldump -u $DB_USER -p"$DB_PASS" wordpress > /opt/webapps/dev-db-dump.sql
+              docker exec -i prod_db mysql -u $DB_USER -p"$DB_PASS" wordpress < /opt/webapps/dev-db-dump.sql
+              docker exec prod_db mysql -u $DB_USER -p"$DB_PASS" wordpress -e "UPDATE wp_options SET option_value = 'https://nimbledev.io' WHERE option_name IN ('siteurl', 'home');"
               docker exec wordpress wp search-replace 'https://dev.nimbledev.io' 'https://nimbledev.io' --precise --recurse-objects --all-tables --allow-root
             """
           }
@@ -87,10 +88,6 @@ pipeline {
       }
     }
 
-    // This is for a specific problem with how an image loads after promotion to prod
-    // I am not sure why this happens to this image only. 
-    // It could be an artifact resulting from using a template
-    // Basically you decode the json from elementor about the home page and then use sed to get rid of dev reference and import to prod
     stage('Replace Elementor Image URLs') {
       steps {
         sh """
