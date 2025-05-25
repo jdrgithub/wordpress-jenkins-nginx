@@ -111,7 +111,7 @@ pipeline {
           # Write the JSON export inside the container to a temp file
           docker exec dev_wordpress sh -c 'wp post meta get 17 _elementor_data --format=json --allow-root > /var/www/html/wp-content/tmp/_elementor_data.json'
 
-          jq /opt/webapps/envs/dev/wp-content/tmp/_elementor_data.json > /tmp/_elementor_data_decoded.json
+          jq '.' /opt/webapps/envs/dev/wp-content/tmp/_elementor_data.json > /tmp/_elementor_data_decoded.json
           sed -i 's|dev.nimbledev.io|nimbledev.io|g' /tmp/_elementor_data_decoded.json
           jq -R -s '.' /tmp/_elementor_data_decoded.json > /tmp/_elementor_data.json
           docker cp /tmp/_elementor_data.json wordpress:/var/www/html/wp-content/tmp/_elementor_data.json
