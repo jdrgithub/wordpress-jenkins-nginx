@@ -1,18 +1,6 @@
 pipeline {
   agent any
 
-  stage('Test GitHub Credential Access') {
-    steps {
-      withCredentials([string(credentialsId: 'nimbledev-github-app', variable: 'GITHUB_TOKEN')]) {
-        sh '''
-          echo "Testing GitHub API access..."
-          curl -i -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/repos/jdrgithub/wordpress-jenkins-nginx
-        '''
-      }
-    }
-  }
-
-
   parameters {
     string(
       name: 'CHANGE_MESSAGE',
@@ -29,6 +17,18 @@ pipeline {
   }
 
   stages {
+
+    stage('Test GitHub Credential Access') {
+      steps {
+        withCredentials([string(credentialsId: 'nimbledev-github-app', variable: 'GITHUB_TOKEN')]) {
+          sh '''
+            echo "Testing GitHub API access..."
+            curl -i -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/repos/<your-username-or-org>/<your-repo-name>
+          '''
+        }
+      }
+    }
+
     stage('Checkout') {
       steps {
         checkout scm
